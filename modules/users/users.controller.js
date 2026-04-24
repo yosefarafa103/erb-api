@@ -1,3 +1,4 @@
+import { cacheAside } from "../../helpers/cache.js";
 import User from "./users.model.js";
 
 export const createUser = async (req, res) => {
@@ -21,8 +22,10 @@ export const createUser = async (req, res) => {
 export const getUsers = async (req, res) => {
   try {
     const { tenantId } = req.query;
-    const users = await User.find()
-    .select("-password");
+    const users = await cacheAside({
+      key: "users",
+      fetcher: async () => await User.find().select("-password"),
+    });
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -125,7 +128,7 @@ export const getUsersByTenant = async (req, res) => {
         },
       },
     })
-      .populate("tenants.tenantId")
+      // .populate("tenants.tenantId")
       .select("-password");
     res.json(users);
   } catch (err) {
@@ -146,6 +149,8 @@ export const switchTenant = async (req, res) => {
     await user.save();
     res.json({ message: "Tenant switched" });
   } catch (err) {
+    console.log(err, err.stack, err.message);
+
     res.status(500).json({ message: err.message });
   }
 };

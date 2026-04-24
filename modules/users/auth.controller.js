@@ -26,6 +26,7 @@ export const signup = async (req, res) => {
             },
           ]
         : [],
+      lastActiveTenant: tenantId,
       defaultTenant: tenantId,
     });
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -51,15 +52,13 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(400).json({
         message: "Cannot find your email",
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({
         message: "Invalid credentials",
@@ -69,17 +68,34 @@ export const login = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-
     user.password = undefined;
-
     return res
       .cookie("token", token, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === "production",
       })
       .json({
         user,
         token,
+      });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+export const logout = async (req, res) => {
+  try {
+    return res
+      .clearCookie("token", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .status(200)
+      .json({
+        message: "Logged out successfully",
       });
   } catch (err) {
     return res.status(500).json({

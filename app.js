@@ -9,22 +9,22 @@ import cookieParser from "cookie-parser";
 import moragn from "morgan";
 const PORT = process.env.PORT;
 const app = express();
-app.use(cookieParser());
 app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(moragn("common"));
-
 app.use("/users", usersRoutes);
 app.use("/tenents", tenentsRoutes);
 
 app.use((err, req, res, next) => {
+  console.log("ERRRRRR: ", err.stack);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
   });
 });
 
 dbConnection()
-  .then(() => {
+  .then(async () => {
     console.log("Database connected");
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
