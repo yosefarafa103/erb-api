@@ -21,12 +21,11 @@ export const createUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const { tenantId } = req.query;
     const users = await cacheAside({
       key: "users",
       fetcher: async () => await User.find().select("-password"),
     });
-    res.json(users);
+    res.json(users.data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
