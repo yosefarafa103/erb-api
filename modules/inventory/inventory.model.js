@@ -10,20 +10,18 @@ const inventorySchema = new Schema(
       required: true,
       index: true,
     },
-
     productId: {
       type: Schema.Types.ObjectId,
       ref: "Product",
       required: true,
       index: true,
+      unique: true,
     },
-
     type: {
       type: String,
       enum: ["in", "out", "adjustment"],
       required: true,
     },
-
     quantity: {
       type: Number,
       required: true,

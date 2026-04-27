@@ -8,6 +8,8 @@ import tenentsRoutes from "./modules/tenents/tenents.routes.js";
 import salesRoutes from "./modules/sales/sales.routes.js";
 import customersRoutes from "./modules/customers/customer.routes.js";
 import productsRoutes from "./modules/products/products.routes.js";
+import inventoryRoutes from "./modules/inventory/inventory.routes.js";
+import journalEntries from "./modules/journalEntries/Journal.routes.js";
 import cookieParser from "cookie-parser";
 import moragn from "morgan";
 const PORT = process.env.PORT;
@@ -33,6 +35,8 @@ app.use("/tenents", tenentsRoutes);
 app.use("/sales", salesRoutes);
 app.use("/customers", customersRoutes);
 app.use("/products", productsRoutes);
+app.use("/inventory", inventoryRoutes);
+app.use("/journal-entries", journalEntries);
 /* Routes */
 
 /* Error Handel Middlware */
