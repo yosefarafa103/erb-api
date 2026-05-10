@@ -9,14 +9,17 @@ import salesRoutes from "./modules/sales/sales.routes.js";
 import customersRoutes from "./modules/customers/customer.routes.js";
 import productsRoutes from "./modules/products/products.routes.js";
 import inventoryRoutes from "./modules/inventory/inventory.routes.js";
+import invoicesRoutes from "./modules/invoice/invoice.routes.js";
+import paymentsRoutes from "./modules/payments/payments.routes.js";
 import journalEntries from "./modules/journalEntries/Journal.routes.js";
+
 import cookieParser from "cookie-parser";
 import moragn from "morgan";
 const PORT = process.env.PORT;
 const app = express();
 app.use(
   cors({
-    origin: ["https://erb-system-gold.vercel.app/", "http://localhost:3000/"],
+    origin: ["https://erb-system-gold.vercel.app/", "http://localhost:3000"],
     credentials: true,
   }),
 );
@@ -30,6 +33,7 @@ app.use(moragn("common"));
 /* Middlwares */
 
 /* Routes */
+
 app.use("/users", usersRoutes);
 app.use("/tenents", tenentsRoutes);
 app.use("/sales", salesRoutes);
@@ -37,6 +41,9 @@ app.use("/customers", customersRoutes);
 app.use("/products", productsRoutes);
 app.use("/inventory", inventoryRoutes);
 app.use("/journal-entries", journalEntries);
+app.use("/payments", paymentsRoutes);
+app.use("/invoices", invoicesRoutes);
+
 /* Routes */
 
 /* Error Handel Middlware */
