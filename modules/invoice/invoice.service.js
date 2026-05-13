@@ -15,7 +15,6 @@ class InvoiceService {
       tenantId,
     })
       .populate("customerId")
-      .populate("createdBy")
       .sort({
         createdAt: -1,
       });
@@ -85,8 +84,55 @@ class InvoiceService {
     if (paid > 0 && paid < invoice.total) status = "partial";
     if (paid === invoice.total) status = "paid";
 
-    return { paid, remaining, status };
+    return { paid, remaining, status, total: invoice.total };
   }
+}
+
+export async function getInvoicePaymentDetails(invoiceId) {
+  const invoice = await InvoiceModel.findById(invoiceId);
+  if (!invoice) {
+    throw new Error("Invoice not found");
+  }
+  const payments = await PaymentModel.aggregate([
+    {
+      $match: {
+        invoiceId: new Types.ObjectId(invoiceId),
+        status: "posted",
+        direction: "in",
+      },
+    },
+    {
+      $group: {
+        _id: "$invoiceId",
+        paidAmount: {
+          $sum: "$amount",
+        },
+        payments: {
+          $push: {
+            _id: "$_id",
+            amount: "$amount",
+            method: "$method",
+            reference: "$reference",
+            description: "$description",
+            createdAt: "$createdAt",
+            status: "$status",
+          },
+        },
+      },
+    },
+  ]);
+
+  const paidAmount = payments[0]?.paidAmount || 0;
+
+  const remainingAmount = invoice.total - paidAmount;
+
+  return {
+    invoiceTotal: invoice.total,
+    paidAmount,
+    remainingAmount,
+    payments: payments[0]?.payments || [],
+    isPaid: remainingAmount <= 0,
+  };
 }
 
 export default new InvoiceService();

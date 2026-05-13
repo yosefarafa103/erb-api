@@ -11,8 +11,14 @@ export const createPayment = async (req, res) => {
   res.json(payment);
 };
 
-export const getPayments = async (_, res) => {
-  const data = await findAll();
+export const getPayments = async (req, res) => {
+  const tenentId = req.query.tenentId;
+  if (!tenentId)
+    return res.status(400).json({
+      err: true,
+      message: "tenentId is missing",
+    });
+  const data = await findAll(tenentId);
   res.json(data);
 };
 

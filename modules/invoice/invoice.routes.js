@@ -7,11 +7,10 @@ router.post("/", controller.createInvoice);
 router.get("/", controller.getInvoices);
 router.get("/:id", controller.getInvoiceById);
 router.patch("/:id", controller.updateInvoice);
-router.delete("/:id", controller.deleteInvoice);
-
+router.delete("/:invoiceId", controller.deleteInvoice);
 router.route("/tenents/:tenantId").get(controller.getInvoicesByTenant);
 
 router.post("/:id/confirm", controller.confirmInvoice);
-
+// get remaining money for invoice
 router.get("/:id/payment-status", controller.getInvoicePaymentStatus);
 export default router;

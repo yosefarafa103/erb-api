@@ -55,8 +55,10 @@ export const create = async (data) => {
   return payment;
 };
 
-export const findAll = async () => {
-  return await PaymentModel.find().sort({ createdAt: -1 });
+export const findAll = async (userId) => {
+  return await PaymentModel.find()
+    .sort({ createdAt: -1 })
+    .populate("invoiceId createdBy")
 };
 
 export const findById = async (id) => {
@@ -71,9 +73,7 @@ export const findById = async (id) => {
 };
 export const update = async (id, data) => {
   const payment = await PaymentModel.findById(id);
-
   if (!payment) throw new Error("Payment not found");
-
   if (payment.status === "posted") {
     throw new Error("Cannot update posted payment");
   }
@@ -95,21 +95,4 @@ export const remove = async (id) => {
   }
 
   await PaymentModel.findByIdAndDelete(id);
-};
-
-export const post = async (id) => {
-  const payment = await PaymentModel.findById(id);
-
-  if (!payment) throw new Error("Payment not found");
-
-  if (payment.status === "posted") {
-    throw new Error("Already posted");
-  }
-
-  const journal = await generateJournalEntry(payment);
-
-  payment.status = "posted";
-  await payment.save();
-
-  return { payment, journal };
 };

@@ -1,5 +1,5 @@
 import InvoiceModel from "./invoice.model.js";
-import invoiceService from "./invoice.service.js";
+import invoiceService, { getInvoicePaymentDetails } from "./invoice.service.js";
 
 export const createInvoice = async (req, res) => {
   try {
@@ -84,3 +84,14 @@ export const getInvoicesByTenant = async (req, res) => {
     });
   }
 };
+
+export async function getInvoicePayment(req, res, next) {
+  try {
+    const invoiceId = req.params.invoiceId;
+    if (!invoiceId) return next("please provide invoiceId");
+    const data = await getInvoicePaymentDetails(invoiceId);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
